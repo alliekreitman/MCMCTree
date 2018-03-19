@@ -1,35 +1,77 @@
 #include <stdio.h>
-#include <math.h>
+#include <stdlib.h>
+#include <time.h>
+#define MAXDATASIZE 100
 
-double coallikelihood(double *timelist,int n
-	           double *datatime, int m //begin with 0
-			   int *datanum, int k)
-{
-	double T=datatime[--m];
-	double M=1.0;
-	int num=datanum[--k];
-	T=T-timelist[--n];
-	while(1){
-		
-		if (T>datatime[m-1]){
-			M=M*exp(-num*(num-1)/2*timelist[n]/N)/N;
-			T=T-timelist[--n];
-			num--;
-		}
-		else{
-			m--;
-			M=M*exp(-num*(num-1)/2*timelist[n]/N);
-			T=T-timelist[--n];
-			num+=datanum[--k];
-		}
-		
-		if (num==1 && m==1) break;
-		
+typedef struct BiNode{
+	struct BiNode *lchi,*rchi;
+	int data;
+}BiNode;
+
+int printTree(BiNode* T){
+	if (T->lchi==NULL && T->rchi==NULL) {
+		printf("%d",T->data);
+		return 1;
 	}
-	return M;
+	printf("(");
+	//printf("%d(",T->data);
+	printTree(T->lchi);
+	printf(",");
+	printTree(T->rchi);
+	printf(")");
+	return 1;
 }
 
 
+BiNode *init(){
+	
+	int n=0;
+	BiNode* S[MAXDATASIZE];
+	int top=-1;
+	while(n<8){
+        S[n]=malloc(sizeof(BiNode));
+		S[n]->lchi=NULL;
+		S[n]->rchi=NULL;
+		S[n]->data=n;
+		n++;
+	}
+	top=n-1;
+	int i,j,len=n;
+	int judge[MAXDATASIZE];
+	//for (i=0;i<len;i++) printf("S[%d]=%d\n",i,S[i]->data);
+	
+	for (i=0;i<MAXDATASIZE;i++) judge[i]=i;
+	srand(time(0));	
+	int r;
+	while(len>1){ //shuffle
+		top++;
+		S[top]=malloc(sizeof(BiNode));
+		S[top]->data=top;
+		r=rand()%len;
+		j=judge[r];
+		S[top]->lchi=S[j];
+		len--;
+		judge[r]=judge[len];
+		//printf("j=%d\n",j);
+	
+		r=rand()%len;
+		j=judge[r];
+		S[top]->rchi=S[j];
+		len--;
+		judge[r]=judge[len];
+		judge[len]=top;
+		len++;
+		//printf("j=%d\n\n",j);
+
+	}
+	
+	//for (i=0;i<top+1;i++) printf("S[%d]=%d\n",i,S[i]->data);
+		
+	return S[top];
+}
+
 int main(){
 	
+	printTree(init());
+	printf("\n");
 }
