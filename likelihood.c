@@ -66,22 +66,21 @@ int DoMatchTime(double *t,int N,
     for (i=Tend;i>=0;i--)
         if ((t[i-1]<NodeT && t[i]>NodeT)|| fabs(t[i]-NodeT)<0.001)
            return i;
-
+	return 0;
 }
 
 double coallikelihood(double *timelist,int n,
-	                  double *datatime, int m, //begin with 0
+	                  double *datatime, int m, //begin with -1
 			          int *datanum, int k,//begin with 0
 			          SIVSolution ode)
 {
-	double T=datatime[--m];
+	n--;m--;
 	double M=1.0;
 	int num=datanum[--k];
-	T=T-timelist[--n];
 
 	int i;
     double v[ode.n],t[ode.n];
-    double N=0.0;
+    double N=1.0;
     int matchT1=ode.n-1,matchT2=ode.n-1;
 
     v[0]=ode.v0;t[0]=0.0;
@@ -89,36 +88,42 @@ double coallikelihood(double *timelist,int n,
         ode=findSolution(ode);
         v[i]=ode.v;
         t[i]=(i+1)*ode.h;
-       // printf("%lf\n",t[i]);
+		 //printf("v[%d]=%lf\n",i,v[i]);
       }
   //  matchT1=DoMatchTime(t,ode.n,T,matchT2);
   //  matchT2=DoMatchTime(t,ode.n,T-timelist[n-1],matchT1);
 
 
 	while(n>0){
-        matchT1=DoMatchTime(t,ode.n,T,matchT2);
-        matchT2=DoMatchTime(t,ode.n,T-timelist[n-1],matchT1);
-        printf("%d,%d\n",matchT2,matchT1);
+        matchT1=DoMatchTime(t,ode.n,timelist[n],matchT2);
+        matchT2=DoMatchTime(t,ode.n,timelist[n-1],matchT1);
+		 //printf("%d,%d\n",matchT2,matchT1);
 
-		if (T>datatime[m-1]){
+		if (timelist[n-1]>datatime[m-1]){
 
-            for (i=matchT2;i<=matchT1;i++) N+=1/v[i];
-            M=num*(num-1)*M*exp(-num*(num-1)/2*N)/v[matchT2]/2;
-            T=T-timelist[--n];
-            num--;
-            printf("calculate coalescence at time %lf, number is %d, M=%lf, N=%lf\n",T,num-1,log(M),N);
+            //for (i=matchT2;i<=matchT1;i++) N+=1/v[i];
+            //M=num*(num-1)*M*exp(-num*(num-1)/2*N)/v[matchT2]/2;
+			for (i=matchT2;i<matchT1;i++) N=N*(1-1/v[i]*num*(num-1)/2);
+			N=N*1/v[i]*num*(num-1)/2;
+			M=M*N;
+            //printf("calculate coalescence at time %lf, number is %d, M=%lf, N=%lf\n",
+			//timelist[n-1],num-1,log(M),N);
+			num--;
 		}
 		else{
 			m--;
             if (num>1) {
-                for (i=matchT2;i<=matchT1;i++) N+=1/v[i];
-                M=M*exp(-num*(num-1)/2*timelist[n]*N);
+                //for (i=matchT2;i<=matchT1;i++) N+=1/v[i];
+                //M=M*exp(-num*(num-1)/2*timelist[n]*N);
+				for (i=matchT2;i<=matchT1;i++) N=N*(1-1/v[i]*num*(num-1)/2);
+				M=M*N;
             }
-			T=T-timelist[--n];
-            printf("calculate no coalescence at time %lf, number is %d, and M=%lf, N=%lf\n",T,num-1,log(M),N);
+            //printf("calculate no coalescence at time %lf, number is %d, and M=%lf, N=%lf\n",
+			//timelist[n-1],num-1,log(M),N);
 			num+=datanum[--k];
 		}
-     N=0;
+     N=1;
+	 n--;
 	}
 
 	return M;
@@ -134,8 +139,8 @@ void sort(double *TimeList, int len){
 
     for (i=0;i<len;i++) judge[i]=1;
 
-    for (i=0;i<len;i++) printf("%lf ",TimeList[i]);
-    printf("\n");
+    //for (i=0;i<len;i++) printf("%lf ",TimeList[i]);
+    //printf("\n");
 
     double min=INF,pmin=INF-1;
     int n=-1,m=0,count=0;
@@ -169,22 +174,18 @@ void sort(double *TimeList, int len){
    // printf("%d\n",m);
    // for (i=0;i<len;i++) printf("[%d]=%d ",i,judge[i]);
    // printf("\n");
-    for (i=0;i<m;i++) printf("%lf ",result[i]);
-    printf("\n");
-    double result1[m-1];
-    for (i=0;i<m-1;i++){
-        result1[i]=result[i+1]-result[i];
-        printf("%lf ",result1[i]);
-    }
-    double datatime[3]={0,3,6};
+   // for (i=0;i<m;i++) printf("%lf ",result[i]);
+   // printf("\n");
+\
+    double datatime[3]={-1,3,6};
     int datanum[3]={0,2,3};
     SIVSolution ode;
-    ode.S0=10;ode.I0=0;ode.v0=1;
+    ode.S0=10;ode.I0=0;ode.v0=20;
     ode.lam=10;ode.alpha=1000;ode.beta=3;ode.ds=0.1;ode.di=1;ode.dv=20;
     ode.h=0.01;ode.n=800;
 
-    printf("\n");
-    printf("likelihood=%lf ",log(coallikelihood(result1,m-1,datatime,3,datanum,3,ode)));
+   // printf("\n");
+    printf("likelihood=%lf \n",log(coallikelihood(result,m,datatime,3,datanum,3,ode)));
     //coallikelihood(result1,m-1,datatime,3,datanum,3,ode);
 
 }
