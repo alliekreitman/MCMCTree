@@ -1,3 +1,3 @@
 # MCMCTree
 
-This code is for estimating the fitness change of within host virus.
+Anaalysis time varying selection rate $d_n/d_s$.
