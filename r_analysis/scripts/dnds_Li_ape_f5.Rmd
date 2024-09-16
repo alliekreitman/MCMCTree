@@ -1,0 +1,318 @@
+---
+title: "dnds calculations"
+output: html_notebook
+---
+
+The purpose of this notebook is the run the ape dnds package on the patients included in the manuscript figure 1 and recreate it using the dnds function 
+
+SETUP
+```{r load packages}
+library(tidyverse)
+library(ape)
+library(adegenet)
+library(FastaUtils)
+library(reshape2)
+library(Biostrings)
+```
+
+```{r set working directory}
+setwd("./data/Li_DnDs")
+```
+
+DNDS ANALYSIS
+
+```{r}
+p1sequences_monotherapy = read.FASTA("p1sequence_monotherapy.fasta", type="DNA")
+results_p1sequences_monotherapy <- dnds(p1sequences_monotherapy, code = 1, codonstart = 1, quiet = FALSE)
+
+p1sequences_comotherapy = read.FASTA("p1sequence_comotherapy.fasta", type="DNA")
+results_p1sequences_comotherapy <- dnds(p1sequences_comotherapy, code = 1, codonstart = 1, quiet = FALSE)
+
+df_results_p1sequences_comotherapy <- melt(as.matrix(results_p1sequences_comotherapy), varnames = c("row", "col")) %>% mutate(therapy = "como") %>% mutate(drug = "indinavir + efavirenz")
+df_results_p1sequences_monotherapy <- melt(as.matrix(results_p1sequences_monotherapy), varnames = c("row", "col")) %>% mutate(therapy = "mono") %>% mutate(drug = "efavirenz")
+
+df_results_p1seqences_therapy <- rbind(df_results_p1sequences_monotherapy, df_results_p1sequences_comotherapy) %>% mutate(patient = "patient1")
+```
+
+```{r p3 analysis}
+#NOT INCLUDE P3 -- missing data
+
+# p3sequences_monotherapy = read.FASTA("p3sequence_monotherapy.fasta", type="DNA")
+# results_p3sequences_monotherapy <- dnds(p3sequences_monotherapy, code = 1, codonstart = 1, quiet = FALSE)
+# 
+# p3sequences_comotherapy = read.FASTA("p3sequence_comotherapy.fasta", type="DNA")
+# results_p3sequences_comotherapy <- dnds(p3sequences_comotherapy, code = 1, codonstart = 1, quiet = FALSE)
+# 
+# df_results_p3sequences_comotherapy <- melt(as.matrix(results_p3sequences_comotherapy), varnames = c("row", "col")) %>% mutate(therapy = "como") %>% mutate(drug = "indinavir")
+# df_results_p3sequences_monotherapy <- melt(as.matrix(results_p3sequences_monotherapy), varnames = c("row", "col")) %>% mutate(therapy = "mono") %>% mutate(drug = "indinavir + efavirenz")
+# 
+# df_results_p3seqences_therapy <- rbind(df_results_p3sequences_monotherapy, df_results_p3sequences_comotherapy) %>% mutate(patient = "patient3")
+```
+
+```{r p21 analysis}
+#NOTE: removed AY000859 & AY000867 because it is a duplicate
+p21sequences_monotherapy = read.FASTA("p21sequence_monotherapy.fasta", type="DNA")
+results_p21sequences_monotherapy <- dnds(p21sequences_monotherapy, code = 1, codonstart = 1, quiet = FALSE)
+
+p21sequences_comotherapy = read.FASTA("p21sequence_comotherapy_withoutDuplicates.fasta", type="DNA")
+results_p21sequences_comotherapy <- dnds(p21sequences_comotherapy, code = 1, codonstart = 1, quiet = FALSE)
+
+df_results_p21sequences_comotherapy <- melt(as.matrix(results_p21sequences_comotherapy), varnames = c("row", "col")) %>% mutate(therapy = "como") %>% mutate(drug = "indinavir + efavirenz")
+df_results_p21sequences_monotherapy <- melt(as.matrix(results_p21sequences_monotherapy), varnames = c("row", "col")) %>% mutate(therapy = "mono") %>% mutate(drug = "indinavir")
+
+df_results_p21seqences_therapy <- rbind(df_results_p21sequences_monotherapy, df_results_p21sequences_comotherapy) %>% mutate(patient = "patient21")
+```
+```{r find duplicated p21 sequence}
+# fastaFile <- readDNAStringSet("p21sequence_comotherapy.fasta")
+# seq_name = names(fastaFile)
+# sequence = paste(fastaFile)
+# p21_como_df <- data.frame(seq_name, sequence)
+# 
+# unique_p100_como <- (distinct(p21_como_df)) %>% select(sequence)
+# # 
+# # duplicated_p21 <- p21_como_df %>%
+# #   group_by(sequence) %>%
+# #   summarise(dup.seq = n())
+# 
+# duplicated_p21_sequence <- p21_como_df %>%
+#   filter(sequence == "CCTCAAATCACTCTTTGGCAACGACCCCTCGTCACAATAAAGATAGGGGGGCAGCTAAAGGAAGCTCTATTAGATACAGGAGCAGATGATACAGTATTAGAAGAAATGAATTTGCCAGGAAGATGGAAACCAAAAATGATAGGGGGAATTGGAGGTTTTATCAAAGTAAGACAGTATGATCAGATAACCATAGAAATCTGTGGACATAAAGCTGTAGGTACAGTATTAGTGGGACCCACACCTGTCAACATAATTGGAAGAAATCTGTTGACTCAGATTGGTTGCACTTTAAATTTTCCCATTAGTCCTATTGAAACTGTACCAGTAAAATTAAAGCCAGGAATGGATGGCCCAAAAGTTAAACAATGGCCATTGACAGAAGAAAAAATAAAAGCATTAGTAGAAATTTGTACAGAAATGGAAAAGGAAGGGAAAATTTCAAAAATTGGGCCTGAAAATCCATATAACACTCCAATATTTGCCATAAAGAAAAAAGACAGTACTAAGTGGAGAAAATTAGTAGATTTCAGAGAACTTAATAAGAAAACTCAAGACTTCTGGGAAGTTCAATTAGGGATACCACATCCCGCAGGGTTAAAAAAGAAAAAATCAGTAACAGTACTGGATGTGGGTGATGCATATTTTTCAGTTCCATTAGATGAAGACTTCAGGAAGTATACTGCATTTACCATACCTAGTGTAAACAATGAGACACCAGGGATTAGATATCAGTACAATGTGCTTCCACAGGGATGGAAAGGATCACCAGCAATATTCCAATGTAGCATGACAAAGATCTTAGAGCCTTTTAGAAAACAAAATCCAGACATAGTTATCTATCAATACATGGATGATTTGCTTGTAGGATCAGACTTAGAAATAGGGCAGCATAGAATAAAAATAGAGGAACTGAGACAACACCTGTTGAGGTGGGGATTTACCACACCAGACAAAAAGCATCAGAAAGAACCTCCATTTCTTTGG")
+# duplicated_p21_sequence
+```
+
+```{r}
+p26sequences_monotherapy = read.FASTA("p26sequence_monotherapy.fasta", type="DNA")
+results_p26sequences_monotherapy <- dnds(p26sequences_monotherapy, code = 1, codonstart = 1, quiet = FALSE)
+
+p26sequences_comotherapy = read.FASTA("p26sequence_comotherapy.fasta", type="DNA")
+results_p26sequences_comotherapy <- dnds(p26sequences_comotherapy, code = 1, codonstart = 1, quiet = FALSE)
+
+df_results_p26sequences_comotherapy <- melt(as.matrix(results_p26sequences_comotherapy), varnames = c("row", "col")) %>% mutate(therapy = "como") %>% mutate(drug = "indinavir + efavirenz")
+df_results_p26sequences_monotherapy <- melt(as.matrix(results_p26sequences_monotherapy), varnames = c("row", "col")) %>% mutate(therapy = "mono") %>% mutate(drug = "efavirenz")
+
+df_results_p26seqences_therapy <- rbind(df_results_p26sequences_monotherapy, df_results_p26sequences_comotherapy) %>% mutate(patient = "patient26")
+```
+
+
+```{r p69 analysis}
+#remove AY000921 because duplicate
+p69sequences_monotherapy = read.FASTA("p69sequence_monotherapy.fasta", type="DNA")
+results_p69sequences_monotherapy <- dnds(p69sequences_monotherapy, code = 1, codonstart = 1, quiet = FALSE)
+
+p69sequences_comotherapy = read.FASTA("p69sequence_comotherapy_withoutDuplicates.fasta", type="DNA")
+results_p69sequences_comotherapy <- dnds(p69sequences_comotherapy, code = 1, codonstart = 1, quiet = FALSE)
+
+df_results_p69sequences_comotherapy <- melt(as.matrix(results_p69sequences_comotherapy), varnames = c("row", "col")) %>% mutate(therapy = "como") %>% mutate(drug = "indinavir + efavirenz")
+df_results_p69sequences_monotherapy <- melt(as.matrix(results_p69sequences_monotherapy), varnames = c("row", "col")) %>% mutate(therapy = "mono") %>% mutate(drug = "indinavir")
+
+df_results_p69seqences_therapy <- rbind(df_results_p69sequences_monotherapy, df_results_p69sequences_comotherapy) %>% mutate(patient = "patient69")
+```
+```{r find duplicate in p69}
+# fastaFile <- readDNAStringSet("p69sequence_comotherapy.fasta")
+# seq_name = names(fastaFile)
+# sequence = paste(fastaFile)
+# p69_como_df <- data.frame(seq_name, sequence)
+# 
+# duplicated_p69 <- p69_como_df %>%
+#   group_by(sequence) %>%
+#   summarise(dup.seq = n())
+# # View(duplicated_p69)
+# 
+# duplicated_sequence <- p69_como_df %>%
+#   filter(sequence == "CCTCAGATCACTCTTTGGCAACGACCCCGCGTCACAATAAAGATAGGAGGGCAACTAAAGGAAGCTCTATTAGATACAGGAGCAGATGATACAGTATTAGAAGACATGAATTTGCCAGGAAGATGGAAGCCAAAAATGATAGGGGGAATTGGAGGTTTTATCAAAGTAAAACAGTATGATCAGATACCCATAGAAATCTGTGGACATAGAGCTATAGGTACAGTGTTAGTAGGACCTACACCTGTCAACATAATTGGAAGAAATCTGTTGACTCAGATTGGTTGCACTTTAAATTTTCCCATTAGTCCTATTGAAACTGTACCAGTAAAATTAAAGCCAGGAATGGATGGCCCAAAAGTTAAACAATGGCCATTGACAGAAGAAAAAATAAAAGCATTAGTAGAAATTTGTACAGAAATGGAAAAGGAAGGGAAAATTTCAAAAATTGGGCCTGAAAATCCATACAATACTCCAGTATTTGCCATAAAGAAAAAAGACAGTACTAGATGGAGAAAATTAGTAGACTTTAGAGAACTTAATAAGAGAACTCAAGACTTCTGGGAAGTTCAATTAGGAATACCACATCCTGCAGGGTTAAAAAAGAACAAATCAGTAACAATACTAGATGTGGGTGATGCATATTTTTCAGTTCCCTTAGATAAAGACTTCAGGAAGTATACTGCATTTACCATACCTAGTATAAACAATGAGACACCAGGGATTAGATATCAGTACAATGTGCTGCCACAGGGATGGAAAGGATCACCAGCAATATTCCAGAGTAGCATGACAAAAATCTTAGAGCCTTTTAGAAAACAAAATCCAGACATGGTGATCTATCAATACATGGATGATTTGTATGTAGGATCTGACTTAGAAATAGAGCAGCATAGAACAAAAATAGAGGAACTGAGACAACATCTGTTGAAGTGGGGATTTACCACACCAGACAAGAAACATCAGAAAGAACCTCCATTCCTTTGG")
+# duplicated_sequence
+```
+
+```{r p100 analysis}
+# remove AY001691.1 bc duplicate
+p100sequences_monotherapy = read.FASTA("p100sequence_monotherapy.fasta", type="DNA")
+results_p100sequences_monotherapy <- dnds(p100sequences_monotherapy, code = 1, codonstart = 1, quiet = FALSE)
+
+p100sequences_comotherapy = read.FASTA("p100sequence_comotherapy_withoutDuplicate.fasta", type="DNA")
+results_p100sequences_comotherapy <- dnds(p100sequences_comotherapy, code = 1, codonstart = 1, quiet = FALSE)
+
+df_results_p100sequences_comotherapy <- melt(as.matrix(results_p100sequences_comotherapy), varnames = c("row", "col")) %>% mutate(therapy = "como") %>% mutate(drug = "ZDV/3TC + efavirenz")
+df_results_p100sequences_monotherapy <- melt(as.matrix(results_p100sequences_monotherapy), varnames = c("row", "col")) %>% mutate(therapy = "mono") %>% mutate(drug = "ZDV/3TC")
+
+df_results_p100seqences_therapy <- rbind(df_results_p100sequences_monotherapy, df_results_p100sequences_comotherapy) %>% mutate(patient = "patient100")
+```
+
+```{r find duplicate sequence in p100}
+fastaFile <- readDNAStringSet("p100sequence_comotherapy.fasta")
+seq_name = names(fastaFile)
+sequence = paste(fastaFile)
+p100_como_df <- data.frame(seq_name, sequence)
+
+duplicated_p100 <- p100_como_df %>%
+  group_by(sequence) %>%
+  summarise(dup.seq = n())
+
+duplicated_sequence <- p100_como_df %>%
+  filter(sequence == "CCTCAAATCACTCTTTGGCAACGACCCCTCGTCACAATAAAGATAGGGGGGCAACTAAAGGAAGCTCTATTAGATACAGGAGCAGATGATACAGTATTAGAAGAAATGAATTTGCCAGGAAGATGGAAACCAAAAATGATAGGGGGAATTGGAGGTTTTATTAAAGTAAGACAGTATGATCAGATAGCCATAGAAATCTGTGGACATAAGGCTATAGGTACAGTATTAGTAGGACCTACACCTGTCAACATAATTGGAAGAAATCTGTTGACTCAGATTGGCTGCACTTTAAATTTTCCCATTAGTCCTATTGAAACTGTACCAGTAAAATTAAAGCCAGGAATGGATGGTCCAAGGGTTAAACAATGGCCATTGACAGAAGAAAAAATAAAAGCATTAGTAGAAATTTGTACAGAAATGGAGAAGGAAGGAAAAATTTCAAAAATTGGGCCTGAAAATCCATACAATACTCCAGTATTTGCCATAAAGAAAAAAAACAGTACTAGATGGAGAAAATTAGTAGATTTTAGAGAACTTAATAAGAGAACTCAAGACTTCTGGGAAGTTCAATTAGGGATACCACATCCCGCAGGGTTAAAAAAGAACAAATCAGTAACAGTACTTGATGTGGGAGATGCATATTTTTCAGTTCCTTTAGATAAAGACTTCAGGAAGTATACTGCATTTACTATACCTAGTACAAACAATGAGACACCAGGGATTAGATATCAGTACAATGTACTTCCACAGGGATGGAAAGGATCACCAGCAATATTTCAAAGTAGCATGACAAAAATTTTAGAGCCTTTTAGAAAGCAAAATCCAGACATAGTCATCTATCAATACGTGGATGATCTGTATGTAGGATCTGACTTAGAAATAGGGCAGCATAGAGCAAAAATAGAGGAACTGAGACAACATCTGTTGAAGTGGGGGTTTATCACACCAGATGAAAAACATCAGAAAGAACACCCATTCCTTTGG")
+duplicated_sequence
+```
+
+```{r p28 analysis}
+p28sequences_monotherapy = read.FASTA("p28sequence_monotherapy.fasta", type="DNA")
+results_p28sequences_monotherapy <- dnds(p28sequences_monotherapy, code = 1, codonstart = 1, quiet = FALSE)
+
+p28sequences_comotherapy = read.FASTA("p28sequence_comotherapy.fasta", type="DNA")
+results_p28sequences_comotherapy <- dnds(p28sequences_comotherapy, code = 1, codonstart = 1, quiet = FALSE)
+
+df_results_p28sequences_comotherapy <- melt(as.matrix(results_p28sequences_comotherapy), varnames = c("row", "col")) %>% mutate(therapy = "como") %>% mutate(drug = "indinavir + efavirenz")
+df_results_p28sequences_monotherapy <- melt(as.matrix(results_p28sequences_monotherapy), varnames = c("row", "col")) %>% mutate(therapy = "mono") %>% mutate(drug = "indinavir")
+
+df_results_p28seqences_therapy <- rbind(df_results_p28sequences_monotherapy, df_results_p28sequences_comotherapy) %>% mutate(patient = "patient28")
+```
+
+```{r 55}
+#remove AY000783 & AY000799 & AY000776 & AY000810
+p55sequences_monotherapy = read.FASTA("p55sequence_monotherapy.fasta", type="DNA")
+results_p55sequences_monotherapy <- dnds(p55sequences_monotherapy, code = 1, codonstart = 1, quiet = FALSE)
+
+p55sequences_comotherapy = read.FASTA("p55sequence_comotherapy_withoutDuplicates.fasta", type="DNA")
+results_p55sequences_comotherapy <- dnds(p55sequences_comotherapy, code = 1, codonstart = 1, quiet = FALSE)
+
+df_results_p55sequences_comotherapy <- melt(as.matrix(results_p55sequences_comotherapy), varnames = c("row", "col")) %>% mutate(therapy = "como") %>% mutate(drug = "indinavir + efavirenz")
+df_results_p55sequences_monotherapy <- melt(as.matrix(results_p55sequences_monotherapy), varnames = c("row", "col")) %>% mutate(therapy = "mono") %>% mutate(drug = "indinavir")
+
+df_results_p55seqences_therapy <- rbind(df_results_p55sequences_monotherapy, df_results_p55sequences_comotherapy) %>% mutate(patient = "patient55")
+```
+
+```{r find p55 duplicate }
+# fastaFile <- readDNAStringSet("p55sequence_monotherapy.fasta")
+# seq_name = names(fastaFile)
+# sequence = paste(fastaFile)
+# p55_como_df <- data.frame(seq_name, sequence)
+# 
+# duplicated_p55 <- p55_como_df %>%
+#   group_by(sequence) %>%
+#   summarise(dup.seq = n())
+# View(duplicated_p55)
+# 
+# duplicated_sequence <- p55_como_df %>%
+#   filter(sequence == "CCTCAGATCACTCTTTGGCAACGACCCCTCGTCACAGTAAAGATAGGGGGGCAGCTAAAGGAAGCTCTATTAGATACAGGAGCAGATGATACAGTATTAGAAGAAATGACTTTGCCAGGAAGATGGAAACCAAAAATGATAGGGGGAATTGGAGGTTTTATCAAAGTAAGACAGTATGATCAAATACCCATAGAAATCTGTGGACATAAGGCTATAGGTACAGTATTAATAGGACCTACACCTGTTAACATAATTGGAAGAAATCTGTTGACTCAGATTGGCTGTACTTTAAATTTTCCCATTAGTCCTATTGAAACTGTACCAGTAAAATTAAAACCAGGAATGGATGGCCCAAAGGTTAAACAATGGCCATTGACAGAAGAAAAAATAAAAGCATTAGTAGAAATTTGTACAGAAATGGAAAAGGAAGGAAAAATTTCAAAAATTGGGCCTGAAAATCCATACAATACTCCAGTATTTGCCATAAAGAAAAAAGACAGTACTAAATGGAGAAAATTAGTAGACTTCAGAGAACTTAATAAGAGAACTCAAGACTTCTGGGAAGTTCAGTTAGGAATACCACATCCCGCAGGGTTAAAAAAGAACAAATCAGTAACAGTACTGGATGTGGGTGATGCATATTTTTCAGTTCCCTTAGATAAAGAATTCAGGAAGTATACTGCATTTACCATACCTAGTACAAACAATGAGACACCAGGGATTAGATATCAGTACAATGTGCTTCCACAGGGATGGAAAGGATCACCAGCAATATTCCAAAGTAGCATGACAAAAATCTTAGAGCCCTTTAGACAACAAAATCCAGAAATAGTTATCTATCAATACATGGATGATTTGTATGTAGGATCTGACTTAGAAATAGGGCAACATAGAACAAAAATAGAGGAACTGAGACAACATCTGTTGACGTGGGGATTTTACACACCAGACAAAAAACATCAGAAAGAACCTCCATTCCTTTGG")
+# duplicated_sequence
+```
+
+```{r p60 analysis}
+p60sequences_monotherapy = read.FASTA("p60sequence_monotherapy.fasta", type="DNA")
+results_p60sequences_monotherapy <- dnds(p60sequences_monotherapy, code = 1, codonstart = 1, quiet = FALSE)
+
+p60sequences_comotherapy = read.FASTA("p60sequence_comotherapy.fasta", type="DNA")
+results_p60sequences_comotherapy <- dnds(p60sequences_comotherapy, code = 1, codonstart = 1, quiet = FALSE)
+
+df_results_p60sequences_comotherapy <- melt(as.matrix(results_p60sequences_comotherapy), varnames = c("row", "col")) %>% mutate(therapy = "como") %>% mutate(drug = "indinavir + efavirenz")
+df_results_p60sequences_monotherapy <- melt(as.matrix(results_p60sequences_monotherapy), varnames = c("row", "col")) %>% mutate(therapy = "mono") %>% mutate(drug = "indinavir")
+
+df_results_p60seqences_therapy <- rbind(df_results_p60sequences_monotherapy, df_results_p60sequences_comotherapy) %>% mutate(patient = "patient60")
+```
+
+```{r p106 analysis}
+p106sequences_monotherapy = read.FASTA("p106sequence_monotherapy.fasta", type="DNA")
+results_p106sequences_monotherapy <- dnds(p106sequences_monotherapy, code = 1, codonstart = 1, quiet = FALSE)
+
+p106sequences_comotherapy = read.FASTA("p106sequence_comotherapy.fasta", type="DNA")
+results_p106sequences_comotherapy <- dnds(p106sequences_comotherapy, code = 1, codonstart = 1, quiet = FALSE)
+
+df_results_p106sequences_comotherapy <- melt(as.matrix(results_p106sequences_comotherapy), varnames = c("row", "col")) %>% mutate(therapy = "como") %>% mutate(drug = "ZDV/3TC + efavirenz")
+df_results_p106sequences_monotherapy <- melt(as.matrix(results_p106sequences_monotherapy), varnames = c("row", "col")) %>% mutate(therapy = "mono") %>% mutate(drug = "ZDV/3TC")
+
+df_results_p106seqences_therapy <- rbind(df_results_p106sequences_monotherapy, df_results_p106sequences_comotherapy) %>% mutate(patient = "patient106")
+```
+
+```{r p126 analysis}
+#remove AY001653 bc duplicate
+p126sequences_monotherapy = read.FASTA("p126sequence_monotherapy.fasta", type="DNA")
+results_p126sequences_monotherapy <- dnds(p126sequences_monotherapy, code = 1, codonstart = 1, quiet = FALSE)
+
+p126sequences_comotherapy = read.FASTA("p126sequence_comotherapy_withoutDuplicates.fasta", type="DNA")
+results_p126sequences_comotherapy <- dnds(p126sequences_comotherapy, code = 1, codonstart = 1, quiet = FALSE)
+
+df_results_p126sequences_comotherapy <- melt(as.matrix(results_p126sequences_comotherapy), varnames = c("row", "col")) %>% mutate(therapy = "como") %>% mutate(drug = "ZDV/3TC + efavirenz")
+df_results_p126sequences_monotherapy <- melt(as.matrix(results_p126sequences_monotherapy), varnames = c("row", "col")) %>% mutate(therapy = "mono") %>% mutate(drug = "ZDV/3TC")
+
+df_results_p126seqences_therapy <- rbind(df_results_p126sequences_monotherapy, df_results_p126sequences_comotherapy) %>% mutate(patient = "patient126")
+```
+```{r}
+# fastaFile <- readDNAStringSet("p126sequence_comotherapy.fasta")
+# seq_name = names(fastaFile)
+# sequence = paste(fastaFile)
+# p126_como_df <- data.frame(seq_name, sequence)
+# 
+# duplicated_p126 <- p126_como_df %>%
+#   group_by(sequence) %>%
+#   summarise(dup.seq = n())
+# View(duplicated_p126)
+# # 
+# duplicated_sequence <- p126_como_df %>%
+#   filter(sequence == "CCTCAAATCACTCTTTGGCAACGACCCCTCGTCACAGTAAAGATAGGGGGGCAGCTAAAGGAAGCTCTATTAGATACAGGAGCAGATGATACGGTATTAGAAGAAATGAATTTGCCAGGAAGATGGAAACCAAAAATGATAGGGGGAATTGGAGGTTTTATCAAAGTGAGACAATATGATCAGATACCTATAGAAATCTGTGGGCATAAAGCTATAGGTACAGTATTAGTAGGACCTACACCTGTCAACATGGTTGGAAGAAATCTGTTGACTCAGATTGGATGCACTTTAAATTTTCCCATTAGTCCTATTGAAACTGTACCAGTAAAATTAAAGCCAGGAATGGATGGCCCAAAAGTTAAACAATGGCCATTGACAGAAGAAAAAATAAAAGCATTAATGGAAATTTGTACAGAAATGGAAAAGGAAGGGAAAATTTCAAAAATTGGGCCTGAAAATCCGTACAATACTCCAGTATTTGCCATAAAGAAAAAGAACGGTACTAGATGGAGAAAATTAGTAGATTTCAGAGAACTTAATAAGAGAACTCAAGACTTCTGGGAAGTCCAGTTAGGAATACCACATCCCGCAGGGTTAAAAAAGAACAAATCAGTAACAGTACTGGATGTGGGTGATGCATATTTTTCAGTTCCTTTAGATAAAGAATTCAGGAAGTATACTGCATTTACCATACCTAGTATAAACAATGAGACACCAGGGATTAGATATCAATACAATGTGCTCCCACAGGGATGGAAAGGATCACCAGCAATATTCCAAAGTAGCATGACAAAAATCTTAGAGCCTTTTAGAAAACAGAATCCAGACATAGTTATCTATCAGTACGTGGATGATTTGTATGTAGCATCTGATTTGGAAATAGGGCAGCATAGAACAAAAATAGAGGAACTGAGACAACATCTGTTGAGGTGGGGGTTAACCACACCAGACCAAAAACATCAGAAAGAACCTCCATTCCTTTGG")
+# duplicated_sequence
+```
+
+```{r p132 analysis}
+p132sequences_monotherapy = read.FASTA("p132sequence_monotherapy.fasta", type="DNA")
+results_p132sequences_monotherapy <- dnds(p132sequences_monotherapy, code = 1, codonstart = 1, quiet = FALSE)
+
+p132sequences_comotherapy = read.FASTA("p132sequence_comotherapy.fasta", type="DNA")
+results_p132sequences_comotherapy <- dnds(p132sequences_comotherapy, code = 1, codonstart = 1, quiet = FALSE)
+
+df_results_p132sequences_comotherapy <- melt(as.matrix(results_p132sequences_comotherapy), varnames = c("row", "col")) %>% mutate(therapy = "como") %>% mutate(drug = "ZDV/3TC + efavirenz")
+df_results_p132sequences_monotherapy <- melt(as.matrix(results_p132sequences_monotherapy), varnames = c("row", "col")) %>% mutate(therapy = "mono") %>% mutate(drug = "ZDV/3TC")
+
+df_results_p132seqences_therapy <- rbind(df_results_p132sequences_monotherapy, df_results_p132sequences_comotherapy) %>% mutate(patient = "patient132")
+```
+
+```{r make 1 large df with all patients}
+# df_results_therapy_patient <- rbind(df_results_p100seqences_therapy, df_results_p106seqences_therapy, df_results_p126seqences_therapy, df_results_p132seqences_therapy, df_results_p1seqences_therapy, df_results_p60seqences_therapy, df_results_p21seqences_therapy, df_results_p26seqences_therapy, df_results_p28seqences_therapy, df_results_p55seqences_therapy, df_results_p69seqences_therapy)
+
+df_results_therapy_patient <- rbind(df_results_p100seqences_therapy, df_results_p106seqences_therapy, df_results_p126seqences_therapy, df_results_p132seqences_therapy, df_results_p1seqences_therapy, df_results_p60seqences_therapy, df_results_p21seqences_therapy, df_results_p26seqences_therapy, df_results_p28seqences_therapy, df_results_p55seqences_therapy, df_results_p69seqences_therapy)
+
+df_results_therapy_patient_edited <- df_results_therapy_patient %>% 
+  filter(value >= 0) %>% 
+  filter(value <= 1000)
+```
+
+
+GGPLOT 
+```{r}
+#function to have 95% credible intervals 
+boxes <- function(x) {
+  r <- quantile(x, probs = c(0.025, 0.25, 0.5, 0.75, 0.975))
+  meanx = mean(x)
+  n = length(x)
+  se = sqrt(var(x)/n)
+  #r <- c( meanx-1.96*se, meanx-se, meanx, meanx+se, meanx+1.96*se )
+  names(r) <- c("ymin", "lower", "middle", "upper", "ymax")
+  r
+}
+```
+
+
+```{r ggplot with outliers (ugly!)}
+ggplot(data=df_results_therapy_patient, aes(x = drug, y = value))+
+  # facet_wrap(~factor(patient, levels=c('patient3','patient21','patient69','patient100', 'patient28', 'patient55', 'patient60', 'patient106', 'patient126', 'patient132')), scales = "free")+
+    facet_wrap(~factor(patient), scales = "free")+
+  stat_summary(geom="boxplot", fun.data=boxes)+
+  #geom_boxplot(ymin = 0, ymax = 1)+
+  ylim(0, 1)+
+  labs(title="dnds by drug with outliers", y = "dnds")
+#ggsave("plot_figure1_dnds_withOutliers.png", width = 10, height = 5)
+```
+
+```{r ggplot without outliers}
+patient_numbers = c("patient100"="Patient 100", "patient106"="Patient 106", "patient126"="Patient 126", "patient132"="Patient 132", "patient1"="Patient 1", "patient60"="Patient 60", "patient21"="Patient 21", "patient26"="Patient 26", "patient28"="Patient 28", "patient55"="Patient 55", "patient69"="Patient 69")
+
+ggplot(data=df_results_therapy_patient_edited, aes(x = drug, y = value))+
+  facet_wrap(~factor(patient, levels = c("patient100", "patient106", "patient126", "patient132", "patient1", "patient60", "patient21", "patient26", "patient28", "patient55", "patient69")), ncol = 3, scales = "free", labeller = as_labeller(patient_numbers))+
+  #geom_boxplot(aes(x = drug, y = value), ymin = 0, outlier.shape = NA)+
+  stat_summary(geom="boxplot", fun.data=boxes)+
+  theme_bw()+
+  theme(strip.background = element_blank(), text = element_text(size = 20))+
+  ylim(0,1)+
+  labs(x="Drugs", y = bquote(d[N]/d[S]))
+
+ggsave("plot_figure1_V4.1_dnds_withoutOutliers.png", width = 14, height = 10)
+```
+
+
+
