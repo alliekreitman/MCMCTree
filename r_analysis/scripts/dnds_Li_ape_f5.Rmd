@@ -277,7 +277,7 @@ GGPLOT
 ```{r}
 #function to have 95% credible intervals 
 boxes <- function(x) {
-  r <- quantile(x, probs = c(0.025, 0.25, 0.5, 0.75, 0.975))
+  r <- quantile(x, probs = c(0.025, 0.5, 0.975))
   meanx = mean(x)
   n = length(x)
   se = sqrt(var(x)/n)
@@ -288,24 +288,14 @@ boxes <- function(x) {
 ```
 
 
-```{r ggplot with outliers (ugly!)}
-ggplot(data=df_results_therapy_patient, aes(x = drug, y = value))+
-  # facet_wrap(~factor(patient, levels=c('patient3','patient21','patient69','patient100', 'patient28', 'patient55', 'patient60', 'patient106', 'patient126', 'patient132')), scales = "free")+
-    facet_wrap(~factor(patient), scales = "free")+
-  stat_summary(geom="boxplot", fun.data=boxes)+
-  #geom_boxplot(ymin = 0, ymax = 1)+
-  ylim(0, 1)+
-  labs(title="dnds by drug with outliers", y = "dnds")
-#ggsave("plot_figure1_dnds_withOutliers.png", width = 10, height = 5)
-```
 
 ```{r ggplot without outliers}
 patient_numbers = c("patient100"="Patient 100", "patient106"="Patient 106", "patient126"="Patient 126", "patient132"="Patient 132", "patient1"="Patient 1", "patient60"="Patient 60", "patient21"="Patient 21", "patient26"="Patient 26", "patient28"="Patient 28", "patient55"="Patient 55", "patient69"="Patient 69")
 
 ggplot(data=df_results_therapy_patient_edited, aes(x = drug, y = value))+
   facet_wrap(~factor(patient, levels = c("patient100", "patient106", "patient126", "patient132", "patient1", "patient60", "patient21", "patient26", "patient28", "patient55", "patient69")), ncol = 3, scales = "free", labeller = as_labeller(patient_numbers))+
-  #geom_boxplot(aes(x = drug, y = value), ymin = 0, outlier.shape = NA)+
-  stat_summary(geom="boxplot", fun.data=boxes)+
+  stat_summary(geom = "errorbar", fun.data = boxes, width = 0.15) +
+  stat_summary(geom = "point", fun = median, size = 3) +
   theme_bw()+
   theme(strip.background = element_blank(), text = element_text(size = 20))+
   ylim(0,1)+
