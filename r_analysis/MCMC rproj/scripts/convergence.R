@@ -24,7 +24,7 @@ length_of_data_df <- data.frame(rows = as.numeric(), patient=as.character(), see
 #load in data in a loop and compile into one large dataframe
 for (file in omega_txt_files){
   #read in dataframe from list of results
-  temp_data <- read_delim(file = file, delim = "  ", col_names=FALSE)
+  temp_data <- read_delim(file = paste0("data/Data_MCTree12/", file, sep = ""), delim = "  ", col_names=FALSE)
   
   length_of_data_df <- rbind(length_of_data_df,
                              data.frame(rows = nrow(temp_data), file = file) %>% 
@@ -45,6 +45,7 @@ entries_per_patient <- length_of_data_df %>%
 # -------- LOAD AND COMBINE MU AND OMEGA FILES -------------
 
 #create empty dataframe to load all data
+#one for the omeag files
 combined_data_frame_omega_raw <- data.frame(mono_therapy_dnds = as.numeric(), 
                                             combo_therapy_dnds = as.numeric(), 
                                             file = as.character(), 
@@ -52,7 +53,7 @@ combined_data_frame_omega_raw <- data.frame(mono_therapy_dnds = as.numeric(),
                                             patient=as.character(),
                                             seed=as.numeric())
 
-
+# and one for the mu files
 combined_data_frame_mu_raw <- data.frame(mutation_rate = as.numeric(), 
                                          no_idea = as.numeric(), 
                                          file = as.character(), 
@@ -63,7 +64,7 @@ combined_data_frame_mu_raw <- data.frame(mutation_rate = as.numeric(),
 # Compile Omega Text Files
 for (file in omega_txt_files){
   #read in dataframe from list of results
-  temp_data <- read_delim(file = file, delim = "  ", col_names=FALSE)
+  temp_data <- read_delim(file = paste0("data/Data_MCTree12/", file, sep = ""), delim = "  ", col_names=FALSE)
   
   #clean up data so it fits with combined dataframe format
   temp_data <- temp_data %>% 
@@ -94,7 +95,7 @@ for (file in omega_txt_files){
 # Compile Mu Text Files
 for (file in mu_txt_files){
   #read in dataframe from list of results
-  temp_data <- read_delim(file = file, delim = "  ", col_names=FALSE)
+  temp_data <- read_delim(file = paste0("data/Data_MCTree12/", file, sep = ""), delim = "  ", col_names=FALSE)
   
   #clean up data so it fits with combined dataframe format
   temp_data <- temp_data %>% 
