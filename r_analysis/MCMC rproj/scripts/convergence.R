@@ -2,7 +2,7 @@
 # GOAL: Use geweke function (https://www.rdocumentation.org/packages/coda/versions/0.19-4/topics/geweke.diag) 
 # to analyze convergence - T test of post-burn in data
 # Author: Allie Kreitman
-# Updated: 2024-06-20
+# Updated: 2024-11-07
 ####
 
 # load libraries
