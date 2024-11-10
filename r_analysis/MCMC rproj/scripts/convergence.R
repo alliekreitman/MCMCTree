@@ -11,7 +11,7 @@ library(plotrix)
 library(coda)
 
 # user input
-percent_burn_in <-  0.7 # percent of data to burn in 
+percent_burn_in <-  0.6 # percent of data to burn in 
 
 #load data list
 omega_txt_files <- list.files(path = "data/Data_MCTree12/", pattern = "*_omega.txt", recursive=TRUE) # list of omega files
@@ -151,8 +151,8 @@ data_omega_mu <- left_join(data_omega_mu, number_convergence_datapoints_by_patie
 #list of patients
 data_patient_list <- unique(data_omega_mu$patient)
 # define fractions for gewek.diag
-f1 <- 0.1 # fraction from beginning of chain
-f2 <- 0.5 # fraction from the end of the chain
+f1 <- 0.33 # fraction from beginning of chain
+f2 <- 0.33 # fraction from the end of the chain
 
 # make an empty dataframe for gewek outputs 
 gewek_stat_df <- data.frame(patient = as.character(), # patient number
@@ -236,4 +236,4 @@ gewek_stat_df <- gewek_stat_df %>%
   mutate(frac1 = f1, frac2 = f2, burn = percent_burn_in) # save variables of convergence analysis
 
 # save output
-# write.csv(gewek_stat_df, "data/20241107_Convergence_outputs/convergence_f1_0.1_f2_0.5_burn_0.7.csv", row.names = FALSE)
+write.csv(gewek_stat_df, "data/20241107_Convergence_outputs/convergence_f1_0.33_f2_0.33_burn_0.6.csv", row.names = FALSE)
