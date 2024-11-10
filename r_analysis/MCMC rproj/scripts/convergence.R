@@ -128,6 +128,39 @@ for (file in mu_txt_files){
 # join omega and mu data by patient/seed/burned
 data_omega_mu <- full_join(combined_data_frame_mu_raw, combined_data_frame_omega_raw, by = c("patient", "id", "seed", "burned_data"))
 
+# # make traceplot ---
+# # reformat data for ggplot by pivoting longer
+# traceplot_data <- data_omega_mu %>% 
+#   select(-no_idea) %>% 
+#   pivot_longer(cols = c(mutation_rate, mono_therapy_dnds, combo_therapy_dnds), names_to = "statistic", values_to = "value") %>% 
+#   group_by(patient,statistic,burned_data, seed) %>% 
+#   mutate(separation_point = max(case_when(burned_data == "Burned" ~ id)))%>% 
+#   ungroup()
+# 
+# #make ggplot for each patient 
+# #list of patients
+# data_patient_list <- unique(data_omega_mu$patient)
+# for (i in 1:length(data_patient_list)){ # loop through each patient
+#   
+#   # make traceplot: 
+#   curr_plot <- ggplot(data = traceplot_data %>% filter(patient == data_patient_list[i]))+ # plot from data filtered for just current patient
+#     theme_bw()+ # looks clean
+#     geom_line(aes(x = id, y = value), size = 1)+ # plot line of statistic values over time (id)
+#     geom_vline(aes(xintercept = separation_point), color = "blue")+ # add vertical line for each point where it goes to only covergence data
+#     facet_grid(statistic~seed, scales = "free")+ # facet by patient and chain (seed) 
+#     labs(title = (paste0("Traceplot for ", data_patient_list[i])))
+#   
+#   # save traceplot for each patient
+#   assign(paste0("traceplot_", data_patient_list[i]), curr_plot)
+# }
+# 
+# # save all the traceplots
+# traceplot_list <- mget(ls(pattern = "^traceplot_p")) # List all variables that start with "traceplot_p"
+# pdf("data/traceplots/all_traceplots.pdf", width = 8, height = 6) # Open a PDF device to save all plots into one file
+# lapply(traceplot_list, print) # Loop through each plot and print it to the PDF
+# dev.off() # Close the PDF device
+
+# format data for gewek.diag --- 
 # remove burned
 data_omega_mu <- data_omega_mu %>% filter(burned_data != "Burned") %>% 
 # make a new ID that is only for the convergence dataset
@@ -148,8 +181,6 @@ data_omega_mu <- left_join(data_omega_mu, number_convergence_datapoints_by_patie
 # write.csv(data_omega_mu, file = "Data_gewek/converged_data_from_gewek.csv")
 
 # ------------------------ big changes
-#list of patients
-data_patient_list <- unique(data_omega_mu$patient)
 # define fractions for gewek.diag
 f1 <- 0.33 # fraction from beginning of chain
 f2 <- 0.33 # fraction from the end of the chain
@@ -236,4 +267,9 @@ gewek_stat_df <- gewek_stat_df %>%
   mutate(frac1 = f1, frac2 = f2, burn = percent_burn_in) # save variables of convergence analysis
 
 # save output
-write.csv(gewek_stat_df, "data/20241107_Convergence_outputs/convergence_f1_0.33_f2_0.33_burn_0.6.csv", row.names = FALSE)
+# write.csv(gewek_stat_df, "data/20241107_Convergence_outputs/convergence_f1_0.33_f2_0.33_burn_0.6.csv", row.names = FALSE)
+
+
+
+
+
