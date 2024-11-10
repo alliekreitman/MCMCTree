@@ -11,7 +11,7 @@ library(plotrix)
 library(coda)
 
 # user input
-percent_burn_in <-  0.6 # percent of data to burn in 
+percent_burn_in <- 0.35 # percent of data to burn in 
 
 #load data list
 omega_txt_files <- list.files(path = "data/Data_MCTree12/", pattern = "*_omega.txt", recursive=TRUE) # list of omega files
@@ -41,8 +41,10 @@ for (file in omega_txt_files){
 entries_per_patient <- length_of_data_df %>% #define new dataframe
   group_by(patient) %>% # group by patient 
   summarise(min_rows = min(rows)) %>% #shortest seed per patient
-  mutate(rows_after_burn = ceiling(min_rows*(1-percent_burn_in))) %>% #second half of data, rounding up if an odd number of rows
-  mutate (nrow_for_convergence = ifelse(rows_after_burn %% 2 == 0, rows_after_burn, rows_after_burn + 1)) %>% # make convergence set even my rounding up odd number of rows after burn in
+  mutate(nrow_for_convergence = ceiling(min_rows*(1-percent_burn_in))) %>% #second half of data, rounding up if an odd number of rows
+  # use following 2 lines (but not line above) for even number after convergence (not currently needed): 
+  # mutate(rows_after_burn = ceiling(min_rows*(1-percent_burn_in))) %>% #second half of data, rounding up if an odd number of rows
+  # mutate (nrow_for_convergence = ifelse(rows_after_burn %% 2 == 0, rows_after_burn, rows_after_burn + 1)) %>% # make convergence set even my rounding up odd number of rows after burn in
   ungroup()
 
 # -------- LOAD AND COMBINE MU AND OMEGA FILES -------------
@@ -138,8 +140,8 @@ data_omega_mu <- full_join(combined_data_frame_mu_raw, combined_data_frame_omega
 #   ungroup()
 # 
 # #make ggplot for each patient 
-# #list of patients
-# data_patient_list <- unique(data_omega_mu$patient)
+#list of patients
+data_patient_list <- unique(data_omega_mu$patient)
 # for (i in 1:length(data_patient_list)){ # loop through each patient
 #   
 #   # make traceplot: 
@@ -267,7 +269,7 @@ gewek_stat_df <- gewek_stat_df %>%
   mutate(frac1 = f1, frac2 = f2, burn = percent_burn_in) # save variables of convergence analysis
 
 # save output
-# write.csv(gewek_stat_df, "data/20241107_Convergence_outputs/convergence_f1_0.33_f2_0.33_burn_0.6.csv", row.names = FALSE)
+write.csv(gewek_stat_df, "data/20241107_Convergence_outputs/convergence_f1_0.33_f2_0.33_burn_0.35.csv", row.names = FALSE)
 
 
 
