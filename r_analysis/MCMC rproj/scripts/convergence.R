@@ -11,7 +11,7 @@ library(plotrix)
 library(coda)
 
 # user input
-percent_burn_in <- 0.35 # percent of data to burn in 
+percent_burn_in <- 0.33 # percent of data to burn in 
 
 #load data list
 omega_txt_files <- list.files(path = "data/Data_MCTree12/", pattern = "*_omega.txt", recursive=TRUE) # list of omega files
@@ -168,6 +168,7 @@ data_omega_mu <- data_omega_mu %>% filter(burned_data != "Burned") %>%
 # make a new ID that is only for the convergence dataset
   group_by(patient, seed) %>% 
   mutate(id_convergence = 1:n()) %>% 
+  filter(id_convergence %% 2 != 0) %>%  # thin mcmc chains by selecting only odd id (every other)
   ungroup()
 
 #count total number of datapoints per patient 
@@ -266,10 +267,11 @@ gewek_stat_df <- gewek_stat_df %>%
   select(-var_4_gewek) %>% # remove that random variable we are not using
   pivot_longer(!c(patient, seed), names_to = "var", values_to = "z") %>% # pivot longer to one row per var 
   mutate(converged_ys = ifelse(z < -1.96 | z > 1.96, "no", "yes")) %>% # make a y/n column for whether it is outside the range of convergence 
-  mutate(frac1 = f1, frac2 = f2, burn = percent_burn_in) # save variables of convergence analysis
+  mutate(frac1 = f1, frac2 = f2, burn = percent_burn_in) %>%  # save variables of convergence analysis
+  filter(patient != "p156") # remove patient not included in figures
 
 # save output
-write.csv(gewek_stat_df, "data/20241107_Convergence_outputs/convergence_f1_0.33_f2_0.33_burn_0.35.csv", row.names = FALSE)
+write.csv(gewek_stat_df, "data/20241107_Convergence_outputs/convergence_f1_0.33_f2_0.33_burn_0.33_thinned.csv", row.names = FALSE)
 
 
 
