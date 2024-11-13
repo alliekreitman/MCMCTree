@@ -11,7 +11,7 @@ library(plotrix)
 library(coda)
 
 # user input
-percent_burn_in <- 0.33 # percent of data to burn in 
+percent_burn_in <- 0.6 # percent of data to burn in 
 
 #load data list
 omega_txt_files <- list.files(path = "data/Data_MCTree12/", pattern = "*_omega.txt", recursive=TRUE) # list of omega files
@@ -132,35 +132,40 @@ data_omega_mu <- full_join(combined_data_frame_mu_raw, combined_data_frame_omega
 
 # # make traceplot ---
 # # reformat data for ggplot by pivoting longer
-# traceplot_data <- data_omega_mu %>% 
-#   select(-no_idea) %>% 
-#   pivot_longer(cols = c(mutation_rate, mono_therapy_dnds, combo_therapy_dnds), names_to = "statistic", values_to = "value") %>% 
-#   group_by(patient,statistic,burned_data, seed) %>% 
-#   mutate(separation_point = max(case_when(burned_data == "Burned" ~ id)))%>% 
-#   ungroup()
-# 
-# #make ggplot for each patient 
+traceplot_data <- data_omega_mu %>%
+  select(-no_idea) %>%
+  pivot_longer(cols = c(mutation_rate, mono_therapy_dnds, combo_therapy_dnds), names_to = "statistic", values_to = "value") %>% # move all statistics to one column
+  group_by(patient,statistic,burned_data, seed) %>% # group by patient, seed, statistic 
+  mutate(separation_point = max(case_when(burned_data == "Burned" ~ id)))%>% # add separation point column that is when the burn in ends
+  ungroup() %>% 
+  filter(patient != "p156") %>%  # remove patient that we are not analyzing
+  fill(separation_point, .direction = "down") # fill in NA values from burn in point
+#
+# #make ggplot for each patient
 #list of patients
 data_patient_list <- unique(data_omega_mu$patient)
-# for (i in 1:length(data_patient_list)){ # loop through each patient
-#   
-#   # make traceplot: 
-#   curr_plot <- ggplot(data = traceplot_data %>% filter(patient == data_patient_list[i]))+ # plot from data filtered for just current patient
-#     theme_bw()+ # looks clean
-#     geom_line(aes(x = id, y = value), size = 1)+ # plot line of statistic values over time (id)
-#     geom_vline(aes(xintercept = separation_point), color = "blue")+ # add vertical line for each point where it goes to only covergence data
-#     facet_grid(statistic~seed, scales = "free")+ # facet by patient and chain (seed) 
-#     labs(title = (paste0("Traceplot for ", data_patient_list[i])))
-#   
-#   # save traceplot for each patient
-#   assign(paste0("traceplot_", data_patient_list[i]), curr_plot)
-# }
-# 
+data_patient_list <- data_patient_list[ !data_patient_list == 'p156']
+
+for (i in 1:length(data_patient_list)){ # loop through each patient
+
+  # make traceplot:
+  curr_plot <- ggplot(data = traceplot_data %>% filter(patient == data_patient_list[i]))+ # plot from data filtered for just current patient
+    theme_bw()+ # looks clean
+    geom_line(aes(x = id, y = value), size = 1)+ # plot line of statistic values over time (id)
+    geom_vline(aes(xintercept = separation_point), color = "blue")+ # add vertical line for each point where it goes to only covergence data
+    facet_grid(statistic~seed, scales = "free")+ # facet by patient and chain (seed)
+    labs(title = (paste0("Traceplot for ", data_patient_list[i])))
+
+  # save traceplot for each patient
+  assign(paste0("traceplot_", data_patient_list[i]), curr_plot)
+}
+
 # # save all the traceplots
-# traceplot_list <- mget(ls(pattern = "^traceplot_p")) # List all variables that start with "traceplot_p"
-# pdf("data/traceplots/all_traceplots.pdf", width = 8, height = 6) # Open a PDF device to save all plots into one file
-# lapply(traceplot_list, print) # Loop through each plot and print it to the PDF
-# dev.off() # Close the PDF device
+traceplot_list <- mget(ls(pattern = "^traceplot_p")) # List all variables that start with "traceplot_p"
+pdf("data/traceplots/all_traceplots.pdf", width = 8, height = 6) # Open a PDF device to save all plots into one file
+lapply(traceplot_list, print) # Loop through each plot and print it to the PDF
+dev.off() # Close the PDF device
+
 
 # format data for gewek.diag --- 
 # remove burned
