@@ -1,3 +1,3 @@
 # MCMCTree
 
-Analysis time varying selection rate $d_n/d_s$.
+Analysis of time varying selection rate $d_n/d_s$.
