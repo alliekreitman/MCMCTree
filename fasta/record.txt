@@ -1,5 +1,3 @@
-AY000223
-
 patient1: 
 mono-therapy: {"AY000431","AY000433","AY000434","AY000435","AY000441","AY000465"};
 como-therapy: {"AY000436"};
