@@ -124,4 +124,30 @@ genebank_data_df_p26 <- genebank_data_df_p26 %>%
 # combine p26 with the rest of the data
 genebank_data_df <- rbind(genebank_data_df, genebank_data_df_p26)
 
+## format for init files -----
+genebank_data_df_summarised <- genebank_data_df %>% 
+  group_by(patient, study_day_collected) %>% 
+  summarise(datanum = n()) %>% 
+  ungroup() %>% 
+  rename(datatime = study_day_collected)
+
+# print the datanum and datatime lists per patient 
+for (i in 1:length(patients_in_study)){
+  curr_data <- genebank_data_df %>% 
+    filter(patient == patients_in_study[i]) %>%  # make curr data frame with one patient
+    arrange(study_day_collected) # sort data by patient and by study day 
+  
+  # list number of unique collection days
+  collection_days_list <- unique(curr_data$study_day_collected)
+  
+  print(patients_in_study[i]) # print patient number
+  
+  for (j in 1:length(collection_days_list)){ # loop through each of the collection days groups to print the data appropriately for the init file
+    curr_data_collection_ids <- curr_data %>% 
+      filter(study_day_collected == collection_days_list[j]) %>% 
+      pull(id)
+    
+    print(paste0("{", curr_data_collection_ids, "}"))
+  }
+}
 
