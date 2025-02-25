@@ -13,7 +13,7 @@
 #define MUNUM 2
 
 //global par
-double seed = 36802;  // define seed
+int seed = 36802;  // define seed
 double THEH;
 double start_time;
 double lambda=0.001;  //mutation rate init
