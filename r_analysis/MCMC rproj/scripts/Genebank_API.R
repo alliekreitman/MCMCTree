@@ -142,12 +142,22 @@ for (i in 1:length(patients_in_study)){
   
   print(patients_in_study[i]) # print patient number
   
+  # print list of datatime 
+  print(genebank_data_df_summarised %>% 
+          filter(patient == patients_in_study[i]) %>% 
+          summarise(datatime_list = paste(datatime, collapse = ",")))
+  
+  # print list of datanum
+  print(genebank_data_df_summarised %>% 
+    filter(patient == patients_in_study[i]) %>% 
+    summarise(datanum_list = paste(datanum, collapse = ",")))
+  
   for (j in 1:length(collection_days_list)){ # loop through each of the collection days groups to print the data appropriately for the init file
-    curr_data_collection_ids <- curr_data %>% 
+    print(curr_data_collection_ids <- curr_data %>% 
       filter(study_day_collected == collection_days_list[j]) %>% 
-      pull(id)
+        summarise(id = paste(dQuote(id), collapse = ",")))
     
-    print(paste0("{", curr_data_collection_ids, "}"))
+    print(paste0("{", curr_data_collection_ids, "}")) # paste list of accession ids for that datatime
   }
 }
 
