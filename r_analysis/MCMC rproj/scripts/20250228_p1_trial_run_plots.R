@@ -24,6 +24,8 @@ mu_results <- tibble(
   mutate(log_Nbegin = log(Nbegin))
 
 ###### traceplots
+# plot the entire chain trace plot -- i.e. make one figure with 4 subplots; 
+# one subplot for each of the 4 parameters (omega1, omega2, lambda, Nbegin)
 omega1_traceplot <- ggplot(omega_results, aes(x = Iter_count, y = omega1))+
   theme_bw()+
   geom_point()
@@ -39,7 +41,6 @@ lambda_traceplot <- ggplot(mu_results, aes(x = Iter_count, y = lambda))+
 log_Nbegin_traceplot <- ggplot(mu_results, aes(x = Iter_count, y = log_Nbegin))+
   theme_bw()+
   geom_point()
-  # scale_y_continuous(limits = c(0, max(mu_results$Nbegin)))  # Set min/max for y-axis
 
 traceplots <- cowplot::plot_grid(omega1_traceplot, omega2_traceplot, lambda_traceplot, log_Nbegin_traceplot)
 traceplots
@@ -67,26 +68,15 @@ ggplot(acf_data, aes(x = lags, y = acf_values)) +
        y = "Autocorrelation") 
 
 
-# combine dataframes 
-omega_mu_results <- rbind(
-  omega_results %>%
-    pivot_longer(cols = c(omega1, omega2), names_to = "variable", values_to = "value"), 
-  mu_results %>% 
-    pivot_longer(cols = c(lambda, Nbegin), names_to = "variable", values_to = "value")
-)
+# # combine dataframes 
+# omega_mu_results <- rbind(
+#   omega_results %>%
+#     pivot_longer(cols = c(omega1, omega2), names_to = "variable", values_to = "value"), 
+#   mu_results %>% 
+#     pivot_longer(cols = c(lambda, Nbegin), names_to = "variable", values_to = "value")
+# )
 
-# plot the entire chain trace plot -- i.e. make one figure with 4 subplots; 
-  # one subplot for each of the 4 parameters (omega1, omega2, lambda, Nbegin)
-ggplot(data = head(omega_mu_results, n = 33000)) +
-  geom_point(aes(x = Iter_count, y = value))+
-  theme_bw()+
-  facet_grid(~variable)
-  
-  
-ggplot(data = omega_mu_results)+
-  theme_bw()+
-  geom_histogram(aes(x = value))+
-  facet_grid(~variable)
 
-# plot the ACFs (also 4 subplots as above) 
+
+
 
