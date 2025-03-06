@@ -13,10 +13,10 @@
 #define MUNUM 2
 
 //global par
-int seed = 36802;  // define seed
+int seed = 76807;  // define seed
 double THEH;
 double start_time;
-double lambda=0.001;  //mutation rate init
+double lambda=0.01;  //mutation rate init
 double omega1=0.1;    // pre ratio init
 double omega2=0.1;    // post ratio init
 double Nbegin=10000.0; // effective pop size init
@@ -31,12 +31,36 @@ double drug_time=14;
 #include "header/Coleselikelihood.h"
 #include "header/Treelikelihood.h"
 
+double gen_normal(double mean, double sd){
+    double u1 = 1.0 - rand() / (RAND_MAX+1.0);
+    double u2 = 1.0 - rand() / (RAND_MAX+1.0);
+    double z0 = sqrt(-2.0 * log(u1))*cos(2.0*M_PI*u2);
+    return mean+z0*sd;
+}    
+
+double gen_lognormal(double mu, double sigma){
+    return exp(gen_normal(mu,sigma));
+}    
+
+double lognormal_density(double x, double mux, double sigmax) {
+    if (x <= 0.000001) {
+        return 0;
+    }
+    return (1 / (x * sigmax * sqrt(2 * M_PI))) * exp(-pow(log(x) - mux, 2) / (2 * sigmax * sigmax));
+}
+
+double log_lognormal_density(double x, double mux, double sigmax) {
+     return -log(x)-log(sigmax)-0.5*log(2 * M_PI)-(pow(log(x) - mux, 2) / (2 * sigmax * sigmax));
+}
 
 void MCMC(){
     int ncount=0;
     int tcount=0;
+    double propmean = 0;
+    double propse = 0.3;
     double ALPHA,r;
-    double llhood;
+    double lnr,lnrd1,lnrd2,lnrd3,lnrd4,lnrd5,lnrd6,lnrd7,lnrd8;
+    double llhood; 
     double pllhood=LOWBODUND;
     BiNode *TREE,*TEMPTREE;
     int id=getpid();
@@ -49,8 +73,6 @@ void MCMC(){
     MakeMatrixNode();
     datatime[0]=-200;
     
-//    sprintf(fname1,"result/p1_%d_mu.txt",id); // change here
-//    sprintf(fname2,"result/p1_%d_omega.txt",id); //change here
     sprintf(fname1,"result/p1_%d_%d_mu.txt",seed,id); // change here
     sprintf(fname2,"result/p1_%d_%d_omega.txt",seed,id); //change here
     
@@ -60,21 +82,34 @@ void MCMC(){
     
     while (ncount<MAXMCTIMES){
 
+// proposals
         tlambda=lambda;
         r=rand()/(RAND_MAX+0.0)-0.5;
-        lambda*=exp(r);
-
+	lnr = gen_lognormal(propmean,propse);
+	lnrd1 = log_lognormal_density(lambda,propmean,propse);
+        lambda*=lnr;
+	lnrd2 = log_lognormal_density(lambda,propmean,propse);
+	
         to1=omega1;
         r=rand()/(RAND_MAX+0.0)-0.5;
-        omega1*=exp(r);
+	lnr = gen_lognormal(propmean,propse);
+	lnrd3 = log_lognormal_density(omega1,propmean,propse);
+        omega1*=lnr;
+	lnrd4 = log_lognormal_density(omega1,propmean,propse);
         
         to2=omega2;
         r=rand()/(RAND_MAX+0.0)-0.5;
-        omega2*=exp(r);
+	lnr = gen_lognormal(propmean,propse);
+	lnrd5 = log_lognormal_density(omega2,propmean,propse);
+        omega2*=lnr;
+	lnrd6 = log_lognormal_density(omega2,propmean,propse);
         
         Ntmp=Nbegin;
         r=rand()/(RAND_MAX+0.0)-0.5;
-        Nbegin*=exp(0.5*r);
+	lnr = gen_lognormal(propmean,propse);
+	lnrd7 = log_lognormal_density(Nbegin,propmean,propse);
+        Nbegin*=lnr;
+	lnrd8 = log_lognormal_density(Nbegin,propmean,propse);
 
         // random change tree
         TEMPTREE=cloneTree(TREE,NULL);
@@ -95,8 +130,7 @@ void MCMC(){
         double tt1=LogTreeLikelihood(TEMPTREE);
         double tt2=coallikelihood(sortedTime,sortTimeN);
         llhood=tt1+tt2;
-        //printf("%lf %lf %d\n",tt,llhood-tt,ncount);
-        ALPHA=MIN(0,llhood-pllhood);
+        ALPHA=MIN(0,llhood-pllhood+(lnrd1-lnrd2+lnrd3-lnrd4+lnrd5-lnrd6+lnrd7-lnrd8));
         r=log(rand()/(RAND_MAX+0.0));
 
         if (r<ALPHA){
@@ -105,9 +139,6 @@ void MCMC(){
              TREE=cloneTree(TEMPTREE,NULL);
              DestroyTree(TEMPTREE);
              tcount++;
- //            printf("%lf %lf count=%d\n",tt1,tt2,tcount);
- //            fprintf(fp1,"%lf  %lf\n",lambda,Nbegin);
- //            fprintf(fp2,"%lf  %lf\n",omega1,omega2);
         }
         else{
             DestroyTree(TEMPTREE);
