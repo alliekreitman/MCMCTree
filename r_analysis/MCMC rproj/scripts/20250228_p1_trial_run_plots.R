@@ -21,6 +21,13 @@ mu_results <- tibble(
   Iter_count = as.numeric(gsub("Iter_count=", "", mu_lines[seq(3, length(mu_lines), by = 3)]))
 )
 
+# combine dataframes 
+omega_mu_results <- rbind(
+  omega_results %>%
+    pivot_longer(cols = c(omega1, omega2), names_to = "variable", values_to = "value"), 
+  mu_results %>% 
+    pivot_longer(cols = c(lambda, Nbegin), names_to = "variable", values_to = "value")
+)
 
 # plot the entire chain trace plot -- i.e. make one figure with 4 subplots; 
   # one subplot for each of the 4 parameters (omega1, omega2, lambda, Nbegin)
