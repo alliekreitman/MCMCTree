@@ -22,8 +22,8 @@ int checkseq(char *seqen,int n){
 
 // change these 3 lines for each patient
 #define DATADAYS 9
-double datatime[DATADAYS+1]={-1,0,8,41,55,111,307,335,405,489};
-int datanum[DATADAYS+1]={0,6,2,2,7,7,6,4,6,7};
+double datatime[DATADAYS+1]={-1,0,27,41,56,111,139,162,342,497};
+int datanum[DATADAYS+1]={0,6,1,8,4,8,8,7,7,7};
 
 BiNode *init()
 {
@@ -32,7 +32,7 @@ BiNode *init()
     char *seq;
     char *name;
     int   L;
-    char *filename="fasta/in_publication/p28sequence.fasta";  // change for each patient
+    char *filename="fasta/in_publication/p132sequence.fasta";  // change for each patient
 
 	int n=0;
 	BiNode* S[MAXDATASIZE];
@@ -47,15 +47,15 @@ BiNode *init()
 
 
 	// data name - change for each patient
-	char b0[][10]={"AY000556","AY000557","AY000559","AY000560","AY000562","AY000578"};
-    	char b1[][10]={"AY000541","AY000584"};
-	char b2[][10]={"AY000542","AY000543"};
-	char b3[][10]={"AY000540","AY000548","AY000550","AY000568","AY000570","AY000573","AY000586"};
-  	char b4[][10]={"AY000563","AY000564","AY000565","AY000567","AY000569","AY000571","AY000583"};
-   	char b5[][10]={"AY000553","AY000554","AY000555","AY000558","AY000579","AY000580"};
-   	char b6[][10]={"AY000545","AY000547","AY000566","AY000581"};
-    	char b7[][10]={"AY000572","AY000574","AY000575","AY000576","AY000577","AY000582"};
-	char b8[][10]={"AY000544","AY000546","AY000549","AY000551","AY000552","AY000561","AY000585"};
+	char b0[][10]={"AY001563","AY001564","AY001566","AY001567","AY001570","AY001571"};
+    	char b1[][10]={"AY001565"};
+	char b2[][10]={"AY001581","AY001584","AY001586","AY001587","AY001588","AY001589","AY001590","AY001608"};
+	char b3[][10]={"AY001606","AY001612","AY001613","AY001616"};
+  	char b4[][10]= {"AY001572","AY001575","AY001576","AY001577","AY001578","AY001580","AY001583","AY001591"};
+   	char b5[][10]={"AY001569","AY001582","AY001585","AY001609","AY001610","AY001611","AY001614","AY001615"};
+   	char b6[][10]={"AY001568","AY001579","AY001592","AY001593","AY001594","AY001617","AY001618"};
+    	char b7[][10]={"AY001573","AY001574","AY001597","AY001599","AY001601","AY001603","AY001605"};
+	char b8[][10]={"AY001595","AY001596","AY001598","AY001600","AY001602","AY001604","AY001607"};
 
 
 
