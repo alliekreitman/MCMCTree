@@ -22,8 +22,8 @@ int checkseq(char *seqen,int n){
 
 // change these 3 lines for each patient
 #define DATADAYS 6 //defined as number of days with data
-double datatime[DATADAYS+1]={-1,0,7,27,55,111,159};
-int datanum[DATADAYS+1]={0,14,13,14,7,7,7};
+double datatime[DATADAYS+1]={-1,0,7,14,50,282,428};
+int datanum[DATADAYS+1]={0,6,4,6,8,8,7};
 
 BiNode *init()
 {
@@ -32,7 +32,7 @@ BiNode *init()
     char *seq;
     char *name;
     int   L;
-    char *filename="fasta/in_publication/p26sequence.fasta";  // change for each patient
+    char *filename="fasta/in_publication/p106sequence.fasta";  // change for each patient
 
 	int n=0;
 	BiNode* S[MAXDATASIZE];
@@ -47,12 +47,12 @@ BiNode *init()
 
 
 	// data name - change for each patient
-	char b0[][10]={"AY000587","AY000594","AY000611","AY000613","AY000614","AY000618","AY000619","AY000621","AY000626","AY000627","AY000629","AY000641","AY000643","AY000644"};
-    	char b1[][10]={"AY000588","AY000590","AY000602","AY000609","AY000610","AY000612","AY000615","AY000616","AY000636","AY000637","AY000638","AY000639","AY000640"};
-	char b2[][10]={"AY000599","AY000600","AY000601","AY000605","AY000606","AY000607","AY000608","AY000617","AY000622","AY000623","AY000630","AY000632","AY000634","AY000646"};
-	char b3[][10]={"AY000596","AY000620","AY000624","AY000625","AY000631","AY000633","AY000635"};
-  	char b4[][10]={"AY000589","AY000598","AY000604","AY000628","AY000645","AY000647","AY000648"};
-   	char b5[][10]={"AY000591","AY000592","AY000593","AY000595","AY000597","AY000603","AY000642"};
+	char b0[][10]={"AY000683","AY000684","AY000695","AY000718","AY000719","AY000720"};
+    	char b1[][10]={"AY000696","AY000697","AY000698","AY000699"};
+	char b2[][10]={"AY000700","AY000701","AY000703","AY000704","AY000707","AY000713"};
+	char b3[][10]={"AY000685","AY000686","AY000687","AY000689","AY000702","AY000705","AY000710","AY000712"};
+  	char b4[][10]={"AY000706","AY000708","AY000709","AY000711","AY000714","AY000715","AY000716","AY000717"};
+   	char b5[][10]={"AY000682","AY000688","AY000690","AY000691","AY000692","AY000693","AY000694"};
 
 
 
