@@ -22,8 +22,8 @@ int checkseq(char *seqen,int n){
 
 // change these 3 lines for each patient
 #define DATADAYS 7
-double datatime[DATADAYS+1]={-1,0,42,112,169,224,276,308};
-int datanum[DATADAYS+1]={0,14,2,7,7,4,6,8};
+double datatime[DATADAYS+1]={-1,0,28,56,84,159,236,413};
+int datanum[DATADAYS+1]={0,8,1,4,6,8,8,7};
 
 BiNode *init()
 {
@@ -32,7 +32,7 @@ BiNode *init()
     char *seq;
     char *name;
     int   L;
-    char *filename="fasta/in_publication/p69sequence.fasta";  // change for each patient
+    char *filename="fasta/in_publication/p126sequence.fasta";  // change for each patient
 
 	int n=0;
 	BiNode* S[MAXDATASIZE];
@@ -47,13 +47,13 @@ BiNode *init()
 
 
 	// data name - change for each patient
-	char b0[][10]={"AY000914","AY000915","AY000916","AY000918","AY000924","AY000927","AY000933","AY000935","AY000937","AY000939","AY000942","AY000944","AY000946","AY000947"};
-    	char b1[][10]={"AY000923","AY000952"};
-	char b2[][10]={"AY000948","AY000949","AY000950","AY000951","AY000958","AY000959","AY000960"};
-	char b3[][10]={"AY000913","AY000917","AY000919","AY000921","AY000922","AY000929","AY000941"};
-  	char b4[][10]={"AY000926","AY000938","AY000940","AY000943"};
-   	char b5[][10]={"AY000930","AY000934","AY000954","AY000955","AY000956","AY000957"};
-   	char b6[][10]={"AY000920","AY000925","AY000928","AY000931","AY000932","AY000936","AY000945","AY000953"};
+	char b0[][10]={"AY001621","AY001627","AY001631","AY001639","AY001649","AY001656","AY001658","AY001632"};
+    	char b1[][10]={"AY001641"};
+	char b2[][10]={"AY001626","AY001635","AY001654","AY001660"};
+	char b3[][10]={"AY001619","AY001623","AY001625","AY001628","AY001651","AY001655"};
+  	char b4[][10]={"AY001622","AY001629","AY001636","AY001638","AY001644","AY001652","AY001653","AY001659"};
+   	char b5[][10]={"AY001620","AY001624","AY001630","AY001633","AY001634","AY001637","AY001640","AY001657"};
+   	char b6[][10]={"AY001642","AY001643","AY001645","AY001646","AY001647","AY001648","AY001650"};
 
 
 
