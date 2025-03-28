@@ -8,11 +8,12 @@ library(tidyverse)
 # install.packages("rentrez")
 library(rentrez) # package specifically designed to interact with NCBI Entrez databases, including GenBank
 
+# --- use this code for making init files 
+
 # list of patients in the study
 patients_in_study <- c("patient100", "patient106", "patient126", "patient132", "patient1", "patient60", "patient21", "patient26", "patient28", "patient55", "patient69")
 
 ### read in file of accession IDs and parse ------
-library(tidyverse)
 
 # Read in data file
 text_data <- read_file("data/record.txt")
@@ -161,3 +162,76 @@ for (i in 1:length(patients_in_study)){
   }
 }
 
+# this code is to compile a table of the patient's notes from genebank
+# two sets of patients - some included in study and others not, but still have fasta files compiled
+# this calls one sample from each patient because comments are the same for all samples of the same patient 
+patients_ID_in_study <- c(
+  "AY001661.1", #patient 100
+  "AY000682.1", #patient 106
+  "AY001619.1", #patient 126
+  "AY001563.1", #patient 132
+  "AY000421.1", #patient 1
+  "AY000828.1", #patient 21
+  "AY000587.1", #patient 26
+  "AY000540.1", #patient 28
+  "AY000759.1", #patient 55
+  "AY001157.1", #patient 60
+  "AY000913.1" #patient 69
+)
+
+patients_ID_not_in_study <- c(
+  "AY000221.1", #patient 11
+  "AY001527.1", #patient 141
+  "AY000157.1", #patient 14
+  "AY001961.1", #patient 155
+  "AY001381.1", #patient 156
+  "AY000282.1", #patient 15
+  "AY000363.1", #patient 20
+  "AY000252.1", #patient 3 
+  "AY001081.1", #patient 85
+  "AY002087.1", #patient 86
+  "AY001305.1", #patient 87
+  "AY001497.1" #patient 93
+)
+
+patients_all <- c(patients_ID_in_study, patients_ID_not_in_study)
+therapy_hx_df <- data.frame("ID" = as.character(), "therapy_hx" = as.character())
+
+for (i in 1:length(patients_all)){
+  # pull metadata from genebank using API 
+  text <- entrez_fetch(db="nucleotide", id=patients_all[i], rettype="gb", retmode="text")
+  
+  # Extract the match
+  extracted_text <- str_extract(text, "/note=\"([^\"]+)\"")
+  
+  # Remove the `/note="` part to keep only the relevant information
+  extracted_text <- gsub('/note="', '', extracted_text)
+  
+  # put text of note into growing dataframe
+  therapy_hx_df_tmp <- data.frame("ID" = patients_all[i], "therapy_hx" = extracted_text)
+  therapy_hx_df <- rbind(therapy_hx_df, therapy_hx_df_tmp)
+  
+  # remove tmp df 
+  rm(therapy_hx_df_tmp)
+}
+
+# add more metadata to df
+therapy_hx_df <- therapy_hx_df %>% 
+  # clean up double spaces in text
+  mutate(therapy_hx = gsub("\\s+", " ", therapy_hx)) %>% 
+  # add patient number
+  mutate(patient = str_extract(therapy_hx, "P\\d+")) %>% 
+  # add column for whether they were included in the OG analysis
+  mutate(in_OG_analyis = case_when(ID %in% patients_ID_in_study ~ "y",
+                                   ID %in% patients_ID_not_in_study ~ "n", 
+                                   TRUE ~ "ruh-roh")
+  ) %>% 
+# therapy change day present? 
+  mutate(therapy_change_date_present_yn = ifelse(
+    str_detect(therapy_hx, "then later switched to"),  # Check if phrase exists
+    "n",  # If phrase exists
+    "y"   # If phrase does not exist
+  ))
+  
+# save therapy_hx_df table
+write.csv(x = therapy_hx_df, file = "data/20250328_genebank_note_df.csv", row.names=FALSE)
