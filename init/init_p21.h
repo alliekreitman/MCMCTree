@@ -32,7 +32,7 @@ BiNode *init()
     char *seq;
     char *name;
     int   L;
-    char *filename="fasta/p21sequence.fasta";  //
+    char *filename="fasta/complete_data_patients/p21sequence.fasta";  //
 
 	int n=0;
 	BiNode* S[MAXDATASIZE];

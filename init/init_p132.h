@@ -32,7 +32,7 @@ BiNode *init()
     char *seq;
     char *name;
     int   L;
-    char *filename="fasta/in_publication/p132sequence.fasta";  // change for each patient
+    char *filename="fasta/complete_data_patients/p132sequence.fasta";  // change for each patient
 
 	int n=0;
 	BiNode* S[MAXDATASIZE];
