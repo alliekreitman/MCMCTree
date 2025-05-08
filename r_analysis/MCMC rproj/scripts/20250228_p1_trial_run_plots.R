@@ -4,8 +4,8 @@ library(cowplot)
 
 # load data
 # Read the file
-omega_lines <- readLines("data/20250228_p1_test_run/p1_76807_411274_omega.txt")
-mu_lines <- readLines("data/20250228_p1_test_run/p1_76807_411274_mu.txt") 
+omega_lines <- readLines("data/20250427_P1_test_VD/p1_76817_537867_omega.txt")
+mu_lines <- readLines("data/20250427_P1_test_VD/p1_76817_537867_mu.txt") 
 
 # Process data
 omega_results <- tibble(
@@ -58,7 +58,7 @@ acf_data <- full_join(omega_results, mu_results, by = "Iter_count", suffix = c("
   unnest(c(acf_values, lags))
 
 # Plot the ACFs
-ggplot(acf_data, aes(x = lags, y = acf_values)) +
+ACF_plots <- ggplot(acf_data, aes(x = lags, y = acf_values)) +
   theme_bw()+
   geom_line() +
   geom_point() +
@@ -67,6 +67,10 @@ ggplot(acf_data, aes(x = lags, y = acf_values)) +
        x = "Lag",
        y = "Autocorrelation") 
 
+
+# save traceplot outputs
+ggsave(filename = "out/traceplots/20250427_P1_test_VD_traceplot.png", traceplots)
+ggsave(filename = "out/traceplots/20250427_P1_test_VD_ACF_plots.png", ACF_plots)
 
 # # combine dataframes 
 # omega_mu_results <- rbind(
