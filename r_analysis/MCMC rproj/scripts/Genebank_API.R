@@ -1,18 +1,19 @@
 ######################
 # Author: Allie Kreitman
-# Script Function: Use API to access genebank to collection information needed for init files
+# Script Function: Use API to access genbank to collection information needed for init files
 ######################
 
 # load packages ------
 library(tidyverse)
 # install.packages("rentrez")
 library(rentrez) # package specifically designed to interact with NCBI Entrez databases, including GenBank
+library(seqinr) # use to load fasta file
 
 # --- use this code for making init files 
 
 # list of patients in the study
-patients_in_study <- c("patient100", "patient106", "patient126", "patient132", "patient1", "patient60", "patient21", "patient26", "patient28", "patient55", "patient69")
-
+patients_in_study <- c("patient156", "patient100", "patient106", "patient126", "patient132", "patient1", "patient60", "patient21", "patient26", "patient28", "patient55", "patient69")
+# patients_in_study <- c("patient156")
 ### read in file of accession IDs and parse ------
 
 # Read in data file
@@ -20,6 +21,15 @@ text_data <- read_file("data/record.txt")
 
 # Extract patient entries
 lines <- str_split(text_data, "\n")[[1]]
+
+# now for patient156, we need to load in the fasta and extract the excession since they are not in record.txt. 
+p156fasta <- seqinr::read.fasta(
+  file = "data/Data_MCTree12/p1/fasta/p156sequence.fasta", 
+  seqtype = "DNA", 
+  as.string = TRUE
+)
+
+p156_accession_numbers <- names(p156fasta)
 
 # Initialize storage
 data_list <- list()
@@ -56,8 +66,13 @@ for (line in lines) {
 
 # Combine all extracted data into a single table
 genebank_data_df <- bind_rows(data_list) %>% 
-  mutate(study_day_collected = NA) %>%  # make empty column for study day collected
-  filter(patient %in% patients_in_study) # remove patients that were not included in the study 
+  mutate(study_day_collected = NA) %>%    # make empty column for study day collected
+  filter(patient %in% patients_in_study) %>%  # remove patients that were not included in the study 
+  # add ids for p156 pulled separately from the fasta
+  rbind(data.frame(patient = "patient156",
+                   therapy = "combo-therapy",
+                   id = p156_accession_numbers, 
+                   study_day_collected = NA))
   
 ### loop of accessing genebank data for each id -----
 
@@ -85,7 +100,7 @@ genebank_data_df <- genebank_data_df %>%
   mutate(study_day_collected = as.numeric(study_day_collected))
 
 ### patient 26 ---- 
-# patient 26 was not included in the list of samples, so the below script will use the fasta file to rebuild the list of samples and collectiond dates
+# patient 26 was not included in the list of samples, so the below script will use the fasta file to rebuild the list of samples and collection dates
 
 # Read in data file
 p26_fasta_file <- read_file("data/p26sequence.fasta")
@@ -176,6 +191,7 @@ patients_ID_in_study <- c(
   "AY000540.1", #patient 28
   "AY000759.1", #patient 55
   "AY001157.1", #patient 60
+  "AY001381.1", #patient 156
   "AY000913.1" #patient 69
 )
 
@@ -184,7 +200,7 @@ patients_ID_not_in_study <- c(
   "AY001527.1", #patient 141
   "AY000157.1", #patient 14
   "AY001961.1", #patient 155
-  "AY001381.1", #patient 156
+  # "AY001381.1", #patient 156
   "AY000282.1", #patient 15
   "AY000363.1", #patient 20
   "AY000252.1", #patient 3 
@@ -234,4 +250,4 @@ therapy_hx_df <- therapy_hx_df %>%
   ))
   
 # save therapy_hx_df table
-write.csv(x = therapy_hx_df, file = "data/20250328_genebank_note_df.csv", row.names=FALSE)
+write.csv(x = therapy_hx_df, file = "data/20251128_genebank_note_df.csv", row.names=FALSE)
